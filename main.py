@@ -4,13 +4,10 @@ import os
 IS_ANDROID = False
 STORAGE_PATH = os.getcwd()
 
-# 在导入 Kivy 之前设置 Config（Android 全屏适配）
+# 在导入 Kivy 之前设置 Config
 from kivy.config import Config
 Config.set('graphics', 'resizable', True)
-Config.set('graphics', 'width', '720')
-Config.set('graphics', 'height', '1280')
-Config.set('graphics', 'minimum_width', '360')
-Config.set('graphics', 'minimum_height', '640')
+# 不设置固定宽高，让 Android 自动适配屏幕
 
 try:
     # 优先尝试 android_config 模块检测
@@ -1182,6 +1179,11 @@ class SettingsTab(FloatLayout):
 class RandomToolApp(App):
     def build(self):
         self.title = '专业随机工具 v0.1'
+
+        # Android 全屏适配：自动填满屏幕并按 DPI 缩放
+        if IS_ANDROID:
+            from kivy.core.window import Window
+            Window.fullscreen = 'auto'
 
         theme_manager = ThemeManager()
         theme = theme_manager.get_current_theme()
