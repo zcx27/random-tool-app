@@ -50,13 +50,9 @@ jobs:
           python -m pip install --upgrade pip setuptools wheel
           pip install buildozer cython
 
-      - name: 准备 Python 3.14 Android 兼容补丁
+      - name: 准备构建
         run: |
-          # 在 p4a 被 buildozer 下载后，自动应用我们的补丁
-          # 通过创建 Python 3 配方的 hook 脚本
-          # 这个路径会被 buildozer 在构建时使用
-          mkdir -p ~/.buildozer
-          echo "补丁文件已就绪"
+          echo "使用 Python 3.12 + Kivy 2.3.0"
 
       - name: 缓存 Buildozer
         uses: actions/cache@v4
@@ -77,43 +73,7 @@ jobs:
           echo "Buildozer: $(buildozer --version 2>&1)"
           echo "Java: $(java -version 2>&1 | head -1)"
 
-          # 第一次构建：p4a 会自动下载到 .buildozer 目录
-          # 如果因为 Python 3.14 问题失败，我们打上补丁重试
           buildozer android debug 2>&1 | tee build_log.txt
-
-          # 检查是否因为 remote_debug 问题失败
-          if grep -q "search_linux_map_for_section" build_log.txt 2>/dev/null; then
-            echo ""
-            echo "=========================================="
-            echo "检测到 Python 3.14 Android 兼容问题，正在打补丁后重试..."
-            echo "=========================================="
-
-            # 找到 p4a 的 python3 recipe 目录
-            P4A_PYTHON3_DIR=$(find .buildozer -path "*/python-for-android/pythonforandroid/recipes/python3" -type d | head -1)
-            if [ -n "$P4A_PYTHON3_DIR" ]; then
-              echo "找到 p4a python3 配方目录: $P4A_PYTHON3_DIR"
-
-              # 复制补丁脚本
-              cp patches/fix_python_android.py "$P4A_PYTHON3_DIR/patches/"
-
-              # 修改配方，在 prebuild_arch 中调用补丁
-              RECIPE_FILE="$P4A_PYTHON3_DIR/__init__.py"
-              # 在 import os 那一行后添加
-              sed -i 's/import os/import os, subprocess, sys/' "$RECIPE_FILE"
-
-              # 在 prebuild_arch 的末尾添加补丁调用
-              # 找到 super().prebuild_arch(arch) 这一行
-              PATCH_CODE='        # Fix Android remote_debug compilation for 3.14\n        fix_script = os.path.join(os.path.dirname(__file__), "patches", "fix_python_android.py")\n        if os.path.exists(fix_script):\n            subprocess.run([sys.executable, fix_script, build_dir], check=False)\n        self.ctx.python_recipe = self'
-              sed -i "s/        self.ctx.python_recipe = self/$PATCH_CODE/" "$RECIPE_FILE"
-
-              echo "补丁已应用到: $P4A_PYTHON3_DIR"
-              grep -n "fix_python_android\|remote_debug" "$RECIPE_FILE" | head -5
-
-              # 清理旧的构建产物并重试
-              rm -rf .buildozer/android/platform/build-arm64-v8a
-              buildozer android debug 2>&1 | tee build_log.txt
-            fi
-          fi
 
       - name: 检查构建结果
         run: |
