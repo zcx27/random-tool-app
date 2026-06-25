@@ -61,7 +61,7 @@ jobs:
             ~/.buildozer
             !~/.buildozer/android/platform/build-*
             !~/.buildozer/android/platform/python-for-android
-          key: buildozer-cache-v1-${{ runner.os }}
+          key: buildozer-cache-v2-${{ runner.os }}
 
       - name: 构建 APK
         run: |
