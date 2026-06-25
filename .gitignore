@@ -20,6 +20,9 @@ venv/
 .DS_Store
 Thumbs.db
 
+# APK
+*.apk
+
 # Temp
 *.tmp
 *.temp
