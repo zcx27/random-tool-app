@@ -24,10 +24,7 @@ android.ndk = 25b
 # 权限设置
 android.permissions = INTERNET,READ_EXTERNAL_STORAGE,WRITE_EXTERNAL_STORAGE
 
-# 接受SDK许可
-android.accept_sdk_license = True
-
-# 自动下载 NDK/SDK（线上构建需要）
+# 接受SDK许可（线上构建自动下载 SDK/NDK）
 android.accept_sdk_license = True
 
 [buildozer]
