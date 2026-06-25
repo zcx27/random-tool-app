@@ -13,7 +13,7 @@ requirements = python3==3.11.11,kivy==2.3.0,hostpython3==3.11.11
 
 # 主程序入口
 orientation = portrait
-fullscreen = 0
+fullscreen = 1
 
 # Android配置 - 仅构建 arm64-v8a（兼容最新手机）
 android.archs = arm64-v8a

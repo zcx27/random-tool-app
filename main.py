@@ -4,6 +4,14 @@ import os
 IS_ANDROID = False
 STORAGE_PATH = os.getcwd()
 
+# 在导入 Kivy 之前设置 Config（Android 全屏适配）
+from kivy.config import Config
+Config.set('graphics', 'resizable', True)
+Config.set('graphics', 'width', '720')
+Config.set('graphics', 'height', '1280')
+Config.set('graphics', 'minimum_width', '360')
+Config.set('graphics', 'minimum_height', '640')
+
 try:
     # 优先尝试 android_config 模块检测
     from android_config import setup_android, get_android_storage_path
