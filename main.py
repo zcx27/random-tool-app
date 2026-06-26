@@ -63,30 +63,18 @@ import time
 
 def setup_fonts():
     """设置中文字体"""
-    # 尝试多个字体路径
+    # Android系统自带中文字体，直接用默认字体
+    import sys
+    if hasattr(sys, 'getandroidapilevel') or os.environ.get('KIVY_BUILD') == 'android':
+        return  # Android默认字体已支持中文
+
+    # 桌面环境使用Windows字体
     font_paths = [
         'C:/Windows/Fonts/msyh.ttc',
         'C:/Windows/Fonts/simhei.ttf',
         'C:/Windows/Fonts/simsun.ttc',
-        '/system/fonts/DroidSansFallback.ttf',  # Android系统字体
-        '/system/fonts/NotoSansCJK-Regular.ttc',  # Android系统字体
     ]
-    
-    # 如果是Android环境，使用系统字体
-    import sys
-    if hasattr(sys, 'getandroidapilevel') or os.environ.get('KIVY_BUILD') == 'android':
-        # Android环境
-        for font in font_paths[3:]:  # 尝试Android系统字体
-            try:
-                from kivy.core.text import LabelBase
-                LabelBase.register(name='ChineseFont', fn_regular=font)
-                print(f"使用Android系统字体: {font}")
-                return
-            except:
-                continue
-    
-    # 桌面环境使用Windows字体
-    for font in font_paths[:3]:
+    for font in font_paths:
         if os.path.exists(font):
             try:
                 from kivy.core.text import LabelBase
@@ -94,9 +82,6 @@ def setup_fonts():
                 return
             except:
                 pass
-    
-    # 如果所有字体都失败，使用默认字体
-    print("警告：无法加载中文字体，使用默认字体")
 class ThemeManager:
     """主题管理器"""
     _instance = None
@@ -185,18 +170,20 @@ class ThemeManager:
 
     def _get_bg_path(self, bg_name):
         """获取背景图片路径"""
+        search_dirs = ['backgrounds', '.']
         extensions = ['.jpg', '.jpeg', '.png', '.gif']
-        for ext in extensions:
-            path = f"backgrounds/{bg_name}{ext}"
-            if os.path.exists(path):
-                return path
-
-        backgrounds_dir = 'backgrounds'
-        if os.path.exists(backgrounds_dir):
-            for file in os.listdir(backgrounds_dir):
-                if bg_name in file:
-                    return os.path.join(backgrounds_dir, file)
-
+        for sd in search_dirs:
+            for ext in extensions:
+                path = f"{sd}/{bg_name}{ext}"
+                if os.path.exists(path):
+                    return path
+        if os.path.exists('backgrounds'):
+            try:
+                for file in os.listdir('backgrounds'):
+                    if bg_name in file:
+                        return os.path.join('backgrounds', file)
+            except:
+                pass
         return None
 
     def _check_backgrounds(self):
@@ -308,7 +295,8 @@ class EasterEggManager:
 class ThemeLabel(Label):
     def __init__(self, text_type='primary', **kwargs):
         super().__init__(**kwargs)
-        self.font_name = 'ChineseFont'
+        if not IS_ANDROID:
+            self.font_name = 'ChineseFont'
         self.text_type = text_type
         self.theme_manager = ThemeManager()
 
@@ -337,7 +325,8 @@ class ThemeLabel(Label):
 class ThemeButton(Button):
     def __init__(self, button_type='primary', **kwargs):
         super().__init__(**kwargs)
-        self.font_name = 'ChineseFont'
+        if not IS_ANDROID:
+            self.font_name = 'ChineseFont'
         self.button_type = button_type
 
         self.background_normal = ''
@@ -392,7 +381,8 @@ class ThemeButton(Button):
 class ThemeTextInput(TextInput):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.font_name = 'ChineseFont'
+        if not IS_ANDROID:
+            self.font_name = 'ChineseFont'
         self.background_normal = ''
         self.background_active = ''
         self.halign = 'center'
@@ -858,7 +848,7 @@ class TextRandomTab(FloatLayout):
             size_hint=(1, None),
             height=dp(200),
             multiline=True,
-            font_name='ChineseFont',
+            
             background_color=(1, 1, 0.98, 0.96),
             foreground_color=(0.25, 0.2, 0.1, 1),
             hint_text_color=(0.5, 0.45, 0.35, 0.9),
@@ -977,7 +967,7 @@ class ListRandomTab(FloatLayout):
             size_hint=(1, None),
             height=dp(180),
             multiline=True,
-            font_name='ChineseFont',
+            
             background_color=(1, 1, 0.98, 0.96),
             foreground_color=(0.25, 0.2, 0.1, 1),
             hint_text_color=(0.5, 0.45, 0.35, 0.9),
@@ -1190,25 +1180,23 @@ class RandomToolApp(App):
         panel = TabbedPanel(
             do_default_tab=False,
             tab_pos='top_mid',
-            tab_height=100,
+            tab_height=120,
             background_color=theme['colors']['tab_bg']
         )
 
-        # 创建标签页
         tabs = [
-            ('  随机数  ', RandomNumberTab()),
-            ('  选择器  ', TextRandomTab()),
-            ('  列表  ', ListRandomTab()),
-            ('  关于  ', SettingsTab())
+            ('随机数', RandomNumberTab()),
+            ('选择器', TextRandomTab()),
+            ('列表', ListRandomTab()),
+            ('关于', SettingsTab())
         ]
 
         for tab_text, tab_content in tabs:
             tab = TabbedPanelItem(text=tab_text)
-            tab.font_name = 'ChineseFont'
-            tab.font_size = 26
+            tab.font_size = 32
             tab.size_hint_x = 0.25
             tab.size_hint_y = None
-            tab.height = 100
+            tab.height = 120
             tab.color = theme['colors']['tab_text']
             tab.background_color = theme['colors']['tab_bg']
             tab.add_widget(tab_content)
