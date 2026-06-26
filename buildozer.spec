@@ -8,7 +8,7 @@ source.dir = .
 source.include_exts = py,png,jpg,kv,ttf
 
 # 版本信息
-version = 1.0
+version = 1.1
 requirements = python3==3.11.11,kivy==2.3.0,hostpython3==3.11.11
 
 # 主程序入口

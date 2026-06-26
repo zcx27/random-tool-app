@@ -1149,7 +1149,7 @@ class SettingsTab(FloatLayout):
             height=dp(90)
         )
         version_label = ThemeLabel(
-            text='版本: 0.1 (移动端优化版)',
+            text='版本: 1.1 (移动端优化版)',
             text_type='primary',
             font_size=sp(18),
             size_hint=(1, None),
@@ -1177,7 +1177,7 @@ class SettingsTab(FloatLayout):
 
 class RandomToolApp(App):
     def build(self):
-        self.title = '专业随机工具 v0.1'
+        self.title = '专业随机工具 v1.1'
 
         # Android 全屏适配：自动填满屏幕并按 DPI 缩放
         if IS_ANDROID:
