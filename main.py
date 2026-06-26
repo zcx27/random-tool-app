@@ -51,6 +51,7 @@ from kivy.uix.floatlayout import FloatLayout
 from kivy.core.text import LabelBase
 from kivy.graphics import Color, Rectangle, RoundedRectangle
 from kivy.clock import Clock
+from kivy.metrics import dp, sp
 import random
 from datetime import datetime
 import time
@@ -488,7 +489,7 @@ class ContentBoxLayout(BoxLayout):
 # ============================================
 
 class RandomNumberTab(FloatLayout):
-    """随机数生成 - 移动端优化布局"""
+    """随机数生成 - 移动端优化布局（全屏适配版）"""
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -496,89 +497,88 @@ class RandomNumberTab(FloatLayout):
         self.background_widget = BackgroundWidget()
         self.add_widget(self.background_widget)
 
-        # 使用ScrollView以适应移动端
+        # ScrollView 填满全屏
         scroll_view = ScrollView(size_hint=(1, 1))
         content = ContentBoxLayout(
             orientation='vertical',
-            padding=[15, 15],
-            spacing=12,
-            size_hint_y=None
+            padding=[dp(32), dp(25), dp(32), dp(25)],  # 左右留边 ~85% 宽度
+            spacing=dp(18),
+            size_hint_y=None,
+            size_hint_x=1
         )
         content.bind(minimum_height=content.setter('height'))
-        content.height = 700
-
         scroll_view.add_widget(content)
 
         # 标题
         title = ThemeLabel(
             text='随机数生成',
             text_type='primary',
-            font_size=26,
+            font_size=sp(30),
             size_hint=(1, None),
-            height=50,
+            height=dp(58),
             bold=True,
             halign='center'
         )
         content.add_widget(title)
 
-        # 范围设置区域 - 垂直堆叠布局
+        # 范围设置区域
         range_section = BoxLayout(
             orientation='vertical',
-            spacing=10,
+            spacing=dp(14),
             size_hint=(1, None),
-            height=150
+            height=dp(160)
         )
 
-        # 最小值
+        # 最小值行
         min_layout = BoxLayout(
             orientation='horizontal',
-            spacing=10,
+            spacing=dp(12),
             size_hint=(1, None),
-            height=60
+            height=dp(68)
         )
         min_label = ThemeLabel(
             text='最小值:',
-            font_size=18,
+            font_size=sp(20),
             halign='left',
-            size_hint_x=0.4
+            size_hint_x=0.35
         )
         min_layout.add_widget(min_label)
 
         self.min_input = ThemeTextInput(
             text='0',
-            font_size=22,
+            font_size=sp(24),
             multiline=False,
-            size_hint_x=0.6,
+            size_hint_x=0.65,
             input_filter='int',
-            padding=[15, 12],
+            padding=[dp(18), dp(14)],
             halign='center',
             write_tab=False
         )
         min_layout.add_widget(self.min_input)
         range_section.add_widget(min_layout)
 
-        # 最大值
+        # 最大值行
         max_layout = BoxLayout(
             orientation='horizontal',
-            spacing=10,
+            spacing=dp(12),
             size_hint=(1, None),
-            height=60
+            height=dp(68)
         )
         max_label = ThemeLabel(
             text='最大值:',
-            font_size=18,
+            font_size=sp(20),
             halign='left',
-            size_hint_x=0.4
+            size_hint_x=0.35
         )
         max_layout.add_widget(max_label)
 
         self.max_input = ThemeTextInput(
             text='100',
-            font_size=22,
+            font_size=sp(24),
             multiline=False,
-            size_hint_x=0.6,
+            size_hint_x=0.65,
             input_filter='int',
-            padding=[15, 12],
+            padding=[dp(18), dp(14)],
             halign='center',
             write_tab=False
         )
@@ -590,49 +590,49 @@ class RandomNumberTab(FloatLayout):
         # 数量控制区域
         count_section = BoxLayout(
             orientation='vertical',
-            spacing=8,
+            spacing=dp(10),
             size_hint=(1, None),
-            height=100
+            height=dp(110)
         )
 
         count_title = ThemeLabel(
             text='生成数量 (1-10):',
             text_type='secondary',
-            font_size=16,
+            font_size=sp(18),
             size_hint=(1, None),
-            height=30,
+            height=dp(34),
             halign='center'
         )
         count_section.add_widget(count_title)
 
         count_slider_layout = BoxLayout(
             orientation='horizontal',
-            spacing=15,
+            spacing=dp(18),
             size_hint=(1, None),
-            height=60
+            height=dp(64)
         )
 
         count_slider_layout.add_widget(ThemeLabel(
             text='1',
-            font_size=16,
+            font_size=sp(18),
             size_hint_x=0.2,
             halign='center'
         ))
 
         self.count_input = ThemeTextInput(
             text='1',
-            font_size=22,
+            font_size=sp(24),
             multiline=False,
             size_hint_x=0.6,
             input_filter='int',
-            padding=[15, 12],
+            padding=[dp(18), dp(14)],
             halign='center'
         )
         count_slider_layout.add_widget(self.count_input)
 
         count_slider_layout.add_widget(ThemeLabel(
             text='10',
-            font_size=16,
+            font_size=sp(18),
             size_hint_x=0.2,
             halign='center'
         ))
@@ -640,24 +640,24 @@ class RandomNumberTab(FloatLayout):
         count_section.add_widget(count_slider_layout)
         content.add_widget(count_section)
 
-        # 生成按钮 - 金色按钮
+        # 生成按钮
         gen_btn = ThemeButton(
             text='生成随机数',
             button_type='primary',
             size_hint=(1, None),
-            height=55,
-            font_size=20
+            height=dp(52),
+            font_size=sp(20)
         )
         gen_btn.bind(on_press=self.generate_random)
         content.add_widget(gen_btn)
 
-        # 结果区域 - 更大的显示区域
+        # 结果区域
         self.result_label = ThemeLabel(
             text='点击上方按钮生成随机数',
             text_type='highlight',
-            font_size=22,
+            font_size=sp(22),
             size_hint=(1, None),
-            height=120,
+            height=dp(110),
             halign='center',
             valign='middle',
             bold=True
@@ -665,13 +665,13 @@ class RandomNumberTab(FloatLayout):
         self.result_label.bind(size=self.result_label.setter('text_size'))
         content.add_widget(self.result_label)
 
-        # 历史记录按钮 - 米黄色按钮
+        # 历史记录按钮
         history_btn = ThemeButton(
             text='查看历史记录',
             button_type='history',
             size_hint=(1, None),
-            height=50,
-            font_size=16
+            height=dp(48),
+            font_size=sp(18)
         )
         history_btn.bind(on_press=self.show_history)
         content.add_widget(history_btn)
@@ -779,7 +779,7 @@ class RandomNumberTab(FloatLayout):
 
 
 class TextRandomTab(FloatLayout):
-    """文本随机选择器 - 带彩蛋功能"""
+    """文本随机选择器 - 全屏适配版"""
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -787,28 +787,25 @@ class TextRandomTab(FloatLayout):
         self.background_widget = BackgroundWidget()
         self.add_widget(self.background_widget)
 
-        # 初始化彩蛋管理器
         self.easter_egg_manager = EasterEggManager()
 
-        # 使用ScrollView
         scroll_view = ScrollView(size_hint=(1, 1))
         content = ContentBoxLayout(
             orientation='vertical',
-            padding=[15, 15],
-            spacing=12,
-            size_hint_y=None
+            padding=[dp(32), dp(25), dp(32), dp(25)],
+            spacing=dp(18),
+            size_hint_y=None,
+            size_hint_x=1
         )
         content.bind(minimum_height=content.setter('height'))
-        content.height = 700
-
         scroll_view.add_widget(content)
 
         title = ThemeLabel(
             text='随机选择器',
             text_type='primary',
-            font_size=26,
+            font_size=sp(30),
             size_hint=(1, None),
-            height=50,
+            height=dp(58),
             bold=True,
             halign='center'
         )
@@ -817,9 +814,9 @@ class TextRandomTab(FloatLayout):
         desc = ThemeLabel(
             text='输入多个选项（每行一个），系统将随机选择其中一个：',
             text_type='secondary',
-            font_size=14,
+            font_size=sp(17),
             size_hint=(1, None),
-            height=40,
+            height=dp(46),
             halign='center'
         )
         content.add_widget(desc)
@@ -827,62 +824,58 @@ class TextRandomTab(FloatLayout):
         # 文本输入框
         self.text_input = TextInput(
             hint_text='例如:\n选项一\n选项二\n选项三\n选项四\n选项五',
-            font_size=18,
+            font_size=sp(18),
             size_hint=(1, None),
-            height=200,
+            height=dp(200),
             multiline=True,
             font_name='ChineseFont',
             background_color=(1, 1, 0.98, 0.96),
             foreground_color=(0.25, 0.2, 0.1, 1),
             hint_text_color=(0.5, 0.45, 0.35, 0.9),
-            padding=[15, 15],
+            padding=[dp(15), dp(15)],
             cursor_color=(0.6, 0.45, 0.1, 1),
             halign='left'
         )
         content.add_widget(self.text_input)
 
-        # 选择按钮 - 金色按钮
         select_btn = ThemeButton(
             text='随机选择',
             button_type='primary',
             size_hint=(1, None),
-            height=55,
-            font_size=20
+            height=dp(52),
+            font_size=sp(20)
         )
         select_btn.bind(on_press=self.select_random)
         content.add_widget(select_btn)
 
-        # 结果区域
         self.result_label = ThemeLabel(
             text='等待随机选择...',
             text_type='highlight',
-            font_size=22,
+            font_size=sp(22),
             size_hint=(1, None),
-            height=120,
+            height=dp(110),
             halign='center',
             bold=True
         )
         self.result_label.bind(size=self.result_label.setter('text_size'))
         content.add_widget(self.result_label)
 
-        # 清空按钮 - 暖红色按钮
         clear_btn = ThemeButton(
             text='清空所有选项',
             button_type='error',
             size_hint=(1, None),
-            height=50,
-            font_size=16
+            height=dp(48),
+            font_size=sp(18)
         )
         clear_btn.bind(on_press=self.clear_text)
         content.add_widget(clear_btn)
 
-        # 提示文字
         hint_label = ThemeLabel(
             text='提示：连续快速点击5次"随机选择"按钮有惊喜',
             text_type='secondary',
-            font_size=12,
+            font_size=sp(14),
             size_hint=(1, None),
-            height=30,
+            height=dp(34),
             halign='center'
         )
         content.add_widget(hint_label)
@@ -908,7 +901,7 @@ class TextRandomTab(FloatLayout):
 
 
 class ListRandomTab(FloatLayout):
-    """列表随机功能"""
+    """列表随机功能 - 全屏适配版"""
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -916,25 +909,23 @@ class ListRandomTab(FloatLayout):
         self.background_widget = BackgroundWidget()
         self.add_widget(self.background_widget)
 
-        # 使用ScrollView
         scroll_view = ScrollView(size_hint=(1, 1))
         content = ContentBoxLayout(
             orientation='vertical',
-            padding=[15, 15],
-            spacing=12,
-            size_hint_y=None
+            padding=[dp(32), dp(25), dp(32), dp(25)],
+            spacing=dp(18),
+            size_hint_y=None,
+            size_hint_x=1
         )
         content.bind(minimum_height=content.setter('height'))
-        content.height = 650
-
         scroll_view.add_widget(content)
 
         title = ThemeLabel(
             text='列表随机化',
             text_type='primary',
-            font_size=26,
+            font_size=sp(30),
             size_hint=(1, None),
-            height=50,
+            height=dp(58),
             bold=True,
             halign='center'
         )
@@ -943,46 +934,43 @@ class ListRandomTab(FloatLayout):
         desc = ThemeLabel(
             text='输入多个项目（每行一个），系统将随机打乱顺序：',
             text_type='secondary',
-            font_size=14,
+            font_size=sp(17),
             size_hint=(1, None),
-            height=40,
+            height=dp(46),
             halign='center'
         )
         content.add_widget(desc)
 
-        # 输入框
         self.text_input = TextInput(
             hint_text='例如:\n项目一\n项目二\n项目三\n项目四\n项目五',
-            font_size=18,
+            font_size=sp(18),
             size_hint=(1, None),
-            height=180,
+            height=dp(180),
             multiline=True,
             font_name='ChineseFont',
             background_color=(1, 1, 0.98, 0.96),
             foreground_color=(0.25, 0.2, 0.1, 1),
             hint_text_color=(0.5, 0.45, 0.35, 0.9),
-            padding=[15, 15],
+            padding=[dp(15), dp(15)],
             cursor_color=(0.6, 0.45, 0.1, 1),
             halign='left'
         )
         content.add_widget(self.text_input)
 
-        # 随机化按钮 - 金色按钮
         randomize_btn = ThemeButton(
             text='随机打乱列表',
             button_type='primary',
             size_hint=(1, None),
-            height=55,
-            font_size=20
+            height=dp(52),
+            font_size=sp(20)
         )
         randomize_btn.bind(on_press=self.randomize_list)
         content.add_widget(randomize_btn)
 
-        # 结果区域
         self.result_label = ThemeLabel(
             text='随机化结果将显示在这里...',
             text_type='highlight',
-            font_size=18,
+            font_size=sp(20),
             size_hint=(1, None),
             height=180,
             halign='center',
@@ -991,13 +979,12 @@ class ListRandomTab(FloatLayout):
         self.result_label.bind(size=self.result_label.setter('text_size'))
         content.add_widget(self.result_label)
 
-        # 清空按钮 - 暖红色按钮
         clear_btn = ThemeButton(
             text='清空列表',
             button_type='error',
             size_hint=(1, None),
-            height=50,
-            font_size=16
+            height=dp(48),
+            font_size=sp(18)
         )
         clear_btn.bind(on_press=self.clear_text)
         content.add_widget(clear_btn)
@@ -1027,7 +1014,7 @@ class ListRandomTab(FloatLayout):
 
 
 class SettingsTab(FloatLayout):
-    """设置和关于页面"""
+    """设置和关于页面 - 全屏适配版"""
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -1035,73 +1022,64 @@ class SettingsTab(FloatLayout):
         self.background_widget = BackgroundWidget()
         self.add_widget(self.background_widget)
 
-        # 使用ScrollView
         scroll_view = ScrollView(size_hint=(1, 1))
         content = ContentBoxLayout(
             orientation='vertical',
-            padding=[15, 15],
-            spacing=12,
-            size_hint_y=None
+            padding=[dp(32), dp(25), dp(32), dp(25)],
+            spacing=dp(18),
+            size_hint_y=None,
+            size_hint_x=1
         )
         content.bind(minimum_height=content.setter('height'))
-        content.height = 700
-
         scroll_view.add_widget(content)
 
         title = ThemeLabel(
             text='关于与设置',
             text_type='primary',
-            font_size=26,
+            font_size=sp(30),
             size_hint=(1, None),
-            height=50,
+            height=dp(58),
             bold=True,
             halign='center'
         )
         content.add_widget(title)
 
-        # 名言展示
         quote_layout = BoxLayout(
             orientation='vertical',
-            spacing=10,
+            spacing=dp(12),
             size_hint=(1, None),
-            height=120
+            height=dp(120)
         )
-
         theme_manager = ThemeManager()
         quote = theme_manager.get_random_quote()
-
         quote_text = ThemeLabel(
             text=f'"{quote}"',
             text_type='secondary',
-            font_size=16,
+            font_size=sp(17),
             size_hint=(1, 1),
             halign='center',
             valign='middle'
         )
         quote_text.bind(size=quote_text.setter('text_size'))
         quote_layout.add_widget(quote_text)
-
         content.add_widget(quote_layout)
 
-        # 功能说明
         usage_layout = BoxLayout(
             orientation='vertical',
-            spacing=8,
+            spacing=dp(10),
             size_hint=(1, None),
-            height=380
+            height=dp(420)
         )
-
         usage_title = ThemeLabel(
             text='功能说明',
             text_type='primary',
-            font_size=22,
+            font_size=sp(24),
             size_hint=(1, None),
-            height=40,
+            height=dp(44),
             halign='center',
             bold=True
         )
         usage_layout.add_widget(usage_title)
-
         usage_text = """随机数生成器:
 • 设定任意范围的整数区间
 • 支持一次生成多个随机数
@@ -1111,7 +1089,6 @@ class SettingsTab(FloatLayout):
 • 输入多个候选项
 • 系统随机选择其中一个
 • 适合决策困难时使用
-
 
 列表随机化:
 • 输入项目列表
@@ -1123,52 +1100,44 @@ class SettingsTab(FloatLayout):
 • 生成历史记录查看
 • 简洁直观的操作界面
 • 移动端优化设计"""
-
         usage_label = ThemeLabel(
             text=usage_text,
             text_type='secondary',
-            font_size=13,
+            font_size=sp(15),
             size_hint=(1, 1),
             halign='left',
             valign='top'
         )
         usage_label.bind(size=usage_label.setter('text_size'))
         usage_layout.add_widget(usage_label)
-
         content.add_widget(usage_layout)
 
-        # 版本信息
         info_layout = BoxLayout(
             orientation='vertical',
-            spacing=6,
+            spacing=dp(8),
             size_hint=(1, None),
-            height=80
+            height=dp(90)
         )
-
         version_label = ThemeLabel(
             text='版本: 0.1 (移动端优化版)',
             text_type='primary',
-            font_size=16,
+            font_size=sp(18),
             size_hint=(1, None),
-            height=30,
+            height=dp(36),
             halign='center',
             bold=True
         )
         info_layout.add_widget(version_label)
-
         date_label = ThemeLabel(
-            text='© 2026 专业随机工具 苦苦知心大哥哥周',
+            text='© 2026 专业随机工具',
             text_type='secondary',
-            font_size=14,
+            font_size=sp(16),
             size_hint=(1, None),
-            height=30,
+            height=dp(36),
             halign='center'
         )
         info_layout.add_widget(date_label)
-
-
         content.add_widget(info_layout)
-
         self.add_widget(scroll_view)
 
 
@@ -1191,8 +1160,8 @@ class RandomToolApp(App):
         panel = TabbedPanel(
             do_default_tab=False,
             tab_pos='top_mid',
-            tab_width=90,
-            tab_height=45,
+            tab_width=Window.width / 4 if IS_ANDROID else 90,
+            tab_height=dp(48),
             background_color=theme['colors']['tab_bg']
         )
 
