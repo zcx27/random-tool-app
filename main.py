@@ -1,17 +1,10 @@
 import os
 
-# ============================================
-# Kivy 初始化（必须先于其他所有 Kivy 导入）
-# ============================================
+# Kivy 导入
 import kivy
 kivy.require('2.3.0')
 
-from kivy.config import Config
-Config.set('graphics', 'resizable', True)
-
-# ============================================
 # Android 环境检测
-# ============================================
 IS_ANDROID = False
 STORAGE_PATH = os.getcwd()
 
@@ -30,13 +23,11 @@ except ImportError:
         except ImportError:
             pass
 
-# 桌面环境设置
 if not IS_ANDROID:
     from kivy.core.window import Window
     Window.size = (360, 640)
     os.environ['KIVY_GL_BACKEND'] = 'angle_sdl2'
 
-# Kivy 控件导入
 from kivy.app import App
 from kivy.uix.tabbedpanel import TabbedPanel, TabbedPanelItem
 from kivy.uix.label import Label
