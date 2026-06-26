@@ -348,10 +348,6 @@ class ThemeButton(Button):
             bg_color = colors['button_primary']
 
         with self.canvas.before:
-            # 底部阴影
-            Color(0, 0, 0, 0.12)
-            self.shadow_rect = RoundedRectangle(radius=[10])
-            # 按钮主体
             Color(*bg_color)
             self.bg_rect = RoundedRectangle(radius=[10])
 
@@ -359,9 +355,6 @@ class ThemeButton(Button):
         self._update_rect()
 
     def _update_rect(self, *args):
-        if hasattr(self, 'shadow_rect'):
-            self.shadow_rect.pos = (self.pos[0] + 4, self.pos[1] - 2)
-            self.shadow_rect.size = (self.size[0] - 2, self.size[1] - 2)
         if hasattr(self, 'bg_rect'):
             self.bg_rect.pos = (self.pos[0] + 1, self.pos[1] + 1)
             self.bg_rect.size = (self.size[0] - 2, self.size[1] - 2)
@@ -407,8 +400,6 @@ class BackgroundWidget(FloatLayout):
         self.bg_image = Image(
             size=self.size,
             pos=self.pos,
-            keep_ratio=False,
-            allow_stretch=True,
         )
 
         self.add_widget(self.bg_image)
@@ -460,18 +451,13 @@ class ContentBoxLayout(BoxLayout):
         theme = theme_manager.get_current_theme()
 
         with self.canvas.before:
-            Color(0, 0, 0, 0.08)
-            self.shadow_rect = RoundedRectangle(radius=[15])
-            Color(1, 1, 1, 0.88)
-            self.bg_rect = RoundedRectangle(radius=[15])
+            Color(1, 1, 1, 0.92)
+            self.bg_rect = RoundedRectangle(radius=[12])
 
         self.bind(size=self._update_bg, pos=self._update_bg)
         self._update_bg()
 
     def _update_bg(self, *args):
-        if hasattr(self, 'shadow_rect'):
-            self.shadow_rect.pos = (self.x + 2, self.y - 3)
-            self.shadow_rect.size = self.size
         if hasattr(self, 'bg_rect'):
             self.bg_rect.pos = self.pos
             self.bg_rect.size = self.size
@@ -1138,11 +1124,6 @@ class SettingsTab(FloatLayout):
 class RandomToolApp(App):
     def build(self):
         self.title = '专业随机工具 v1.1'
-
-        # Android 全屏适配：自动填满屏幕并按 DPI 缩放
-        if IS_ANDROID:
-            from kivy.core.window import Window
-            Window.fullscreen = 'auto'
 
         theme_manager = ThemeManager()
         theme = theme_manager.get_current_theme()
