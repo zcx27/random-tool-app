@@ -1,21 +1,25 @@
 import os
 
-# 检测是否为 Android 环境
+# ============================================
+# Kivy 初始化（必须先于其他所有 Kivy 导入）
+# ============================================
+import kivy
+kivy.require('2.3.0')
+
+from kivy.config import Config
+Config.set('graphics', 'resizable', True)
+
+# ============================================
+# Android 环境检测
+# ============================================
 IS_ANDROID = False
 STORAGE_PATH = os.getcwd()
 
-# 在导入 Kivy 之前设置 Config
-from kivy.config import Config
-Config.set('graphics', 'resizable', True)
-# 不设置固定宽高，让 Android 自动适配屏幕
-
 try:
-    # 优先尝试 android_config 模块检测
     from android_config import setup_android, get_android_storage_path
     IS_ANDROID = setup_android()
     STORAGE_PATH = get_android_storage_path()
 except ImportError:
-    # android_config 不存在时，通过环境变量检测
     if os.environ.get('KIVY_BUILD') == 'android':
         IS_ANDROID = True
         try:
@@ -32,10 +36,7 @@ if not IS_ANDROID:
     Window.size = (360, 640)
     os.environ['KIVY_GL_BACKEND'] = 'angle_sdl2'
 
-import kivy
-
-kivy.require('2.3.0')
-
+# Kivy 控件导入
 from kivy.app import App
 from kivy.uix.tabbedpanel import TabbedPanel, TabbedPanelItem
 from kivy.uix.label import Label
@@ -44,7 +45,6 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.gridlayout import GridLayout
-from kivy.core.window import Window
 from kivy.uix.popup import Popup
 from kivy.uix.image import Image
 from kivy.uix.floatlayout import FloatLayout
