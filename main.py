@@ -123,9 +123,7 @@ class ThemeManager:
         # 适配浅黄背景的配色方案
         self.themes = {
             'mobile': {  # 移动端主题
-                'name': '移动端',
-                'bg_image': self._get_bg_path('我的背景1'),
-                'bg_opacity': 0.9,
+                'name': '移动端',                'bg_opacity': 0.9,
                 'colors': {
                     # 字体颜色 - 适配浅黄背景的深色调
                     'text_primary': (0.25, 0.2, 0.1, 1),  # 深棕黄色
@@ -157,32 +155,10 @@ class ThemeManager:
         }
 
         self.current_theme = 'mobile'
-        self._check_backgrounds()
-
-    def _get_bg_path(self, bg_name):
-        """获取背景图片路径"""
-        search_dirs = ['backgrounds', '.']
-        extensions = ['.jpg', '.jpeg', '.png', '.gif']
-        for sd in search_dirs:
-            for ext in extensions:
-                path = f"{sd}/{bg_name}{ext}"
-                if os.path.exists(path):
-                    return path
-        if os.path.exists('backgrounds'):
-            try:
-                for file in os.listdir('backgrounds'):
-                    if bg_name in file:
-                        return os.path.join('backgrounds', file)
-            except:
-                pass
-        return None
-
-    def _check_backgrounds(self):
-        """检查背景图片"""
-        pass
 
     def get_current_theme(self):
-        return self.themes[self.current_theme]
+        theme = dict(self.themes[self.current_theme])
+        return theme
 
     def get_color(self, color_name):
         theme = self.get_current_theme()
@@ -392,55 +368,6 @@ class ThemeTextInput(TextInput):
 # 背景和内容布局
 # ============================================
 
-class BackgroundWidget(FloatLayout):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.theme_manager = ThemeManager()
-
-        self.bg_image = Image(
-            size=self.size,
-            pos=self.pos,
-        )
-
-        self.add_widget(self.bg_image)
-
-        Clock.schedule_once(self.update_background, 0.1)
-        self.bind(size=self._update_size, pos=self._update_size)
-
-    def update_background(self, dt=0):
-        theme = self.theme_manager.get_current_theme()
-        bg_path = theme['bg_image']
-
-        if bg_path:
-            self.bg_image.source = bg_path
-            self.bg_image.opacity = theme['bg_opacity']
-        else:
-            self.bg_image.source = ''
-            self._draw_gradient()
-
-    def _draw_gradient(self):
-        self.canvas.before.clear()
-        with self.canvas.before:
-            colors = [
-                (1.0, 0.85, 0.90),
-                (0.95, 0.82, 0.92),
-                (0.90, 0.80, 0.95),
-                (0.85, 0.82, 0.98),
-                (0.80, 0.85, 1.0),
-            ]
-            bands = 60
-            for i in range(bands):
-                t = i / bands
-                idx = min(int(t * len(colors)), len(colors) - 1)
-                c = colors[idx]
-                Color(c[0], c[1], c[2], 1)
-                Rectangle(pos=(self.x, self.y + i * (self.height / bands)), size=(self.width, self.height / bands + 1))
-
-    def _update_size(self, *args):
-        self.bg_image.size = self.size
-        self.bg_image.pos = self.pos
-
-
 class ContentBoxLayout(BoxLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -472,9 +399,6 @@ class RandomNumberTab(FloatLayout):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-
-        self.background_widget = BackgroundWidget()
-        self.add_widget(self.background_widget)
 
         # ScrollView 填满全屏
         scroll_view = ScrollView(size_hint=(1, 1))
@@ -762,9 +686,6 @@ class TextRandomTab(FloatLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        self.background_widget = BackgroundWidget()
-        self.add_widget(self.background_widget)
-
         self.easter_egg_manager = EasterEggManager()
 
         scroll_view = ScrollView(size_hint=(1, 1))
@@ -883,9 +804,6 @@ class ListRandomTab(FloatLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        self.background_widget = BackgroundWidget()
-        self.add_widget(self.background_widget)
-
         scroll_view = ScrollView(size_hint=(1, 1))
         content = ContentBoxLayout(
             orientation='vertical',
@@ -994,9 +912,6 @@ class SettingsTab(FloatLayout):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-
-        self.background_widget = BackgroundWidget()
-        self.add_widget(self.background_widget)
 
         scroll_view = ScrollView(size_hint=(1, 1))
         content = ContentBoxLayout(
