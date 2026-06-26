@@ -370,6 +370,10 @@ class ThemeButton(Button):
             bg_color = colors['button_primary']
 
         with self.canvas.before:
+            # 底部阴影
+            Color(0, 0, 0, 0.12)
+            self.shadow_rect = RoundedRectangle(radius=[10])
+            # 按钮主体
             Color(*bg_color)
             self.bg_rect = RoundedRectangle(radius=[10])
 
@@ -377,6 +381,9 @@ class ThemeButton(Button):
         self._update_rect()
 
     def _update_rect(self, *args):
+        if hasattr(self, 'shadow_rect'):
+            self.shadow_rect.pos = (self.pos[0] + 4, self.pos[1] - 2)
+            self.shadow_rect.size = (self.size[0] - 2, self.size[1] - 2)
         if hasattr(self, 'bg_rect'):
             self.bg_rect.pos = (self.pos[0] + 1, self.pos[1] + 1)
             self.bg_rect.size = (self.size[0] - 2, self.size[1] - 2)
@@ -425,7 +432,6 @@ class BackgroundWidget(FloatLayout):
             allow_stretch=True,
         )
 
-        self.bg_color = None
         self.add_widget(self.bg_image)
 
         Clock.schedule_once(self.update_background, 0.1)
@@ -438,28 +444,32 @@ class BackgroundWidget(FloatLayout):
         if bg_path and os.path.exists(bg_path):
             self.bg_image.source = bg_path
             self.bg_image.opacity = theme['bg_opacity']
-
-            if self.bg_color:
-                self.bg_color.a = 0
         else:
             self.bg_image.source = ''
-            if not self.bg_color:
-                with self.canvas.before:
-                    self.bg_color = Color(1, 1, 0.95, 1)  # 浅黄色
-                    self.bg_rect = Rectangle()
+            self._draw_gradient()
 
-            if self.bg_color:
-                self.bg_color.a = 1
-                self.bg_rect.size = self.size
-                self.bg_rect.pos = self.pos
+    def _draw_gradient(self):
+        self.canvas.before.clear()
+        with self.canvas.before:
+            colors = [
+                (1.0, 0.85, 0.90),
+                (0.95, 0.82, 0.92),
+                (0.90, 0.80, 0.95),
+                (0.85, 0.82, 0.98),
+                (0.80, 0.85, 1.0),
+            ]
+            bands = 60
+            for i in range(bands):
+                t = i / bands
+                idx = min(int(t * len(colors)), len(colors) - 1)
+                c = colors[idx]
+                Color(c[0], c[1], c[2], 1)
+                Rectangle(pos=(self.x, self.y + i * (self.height / bands)), size=(self.width, self.height / bands + 1))
 
     def _update_size(self, *args):
         self.bg_image.size = self.size
         self.bg_image.pos = self.pos
-
-        if hasattr(self, 'bg_rect'):
-            self.bg_rect.size = self.size
-            self.bg_rect.pos = self.pos
+        self._draw_gradient()
 
 
 class ContentBoxLayout(BoxLayout):
@@ -472,16 +482,21 @@ class ContentBoxLayout(BoxLayout):
         theme = theme_manager.get_current_theme()
 
         with self.canvas.before:
-            Color(*theme['colors']['content_bg'])
+            Color(0, 0, 0, 0.08)
+            self.shadow_rect = RoundedRectangle(radius=[15])
+            Color(1, 1, 1, 0.88)
             self.bg_rect = RoundedRectangle(radius=[15])
 
         self.bind(size=self._update_bg, pos=self._update_bg)
         self._update_bg()
 
     def _update_bg(self, *args):
+        if hasattr(self, 'shadow_rect'):
+            self.shadow_rect.pos = (self.x + 2, self.y - 3)
+            self.shadow_rect.size = self.size
         if hasattr(self, 'bg_rect'):
-            self.bg_rect.size = self.size
             self.bg_rect.pos = self.pos
+            self.bg_rect.size = self.size
 
 
 # ============================================
@@ -1164,12 +1179,12 @@ class RandomToolApp(App):
             background_color=theme['colors']['tab_bg']
         )
 
-        # 创建标签页
+        # 创建标签页（带 emoji 图标）
         tabs = [
-            ('随机数', RandomNumberTab()),
-            ('选择器', TextRandomTab()),
-            ('列表', ListRandomTab()),
-            ('关于', SettingsTab())
+            ('🎲 随机数', RandomNumberTab()),
+            ('✨ 选择器', TextRandomTab()),
+            ('🔀 列表', ListRandomTab()),
+            ('⚙️ 关于', SettingsTab())
         ]
 
         for tab_text, tab_content in tabs:
