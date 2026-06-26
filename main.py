@@ -65,8 +65,11 @@ def setup_fonts():
     """设置中文字体"""
     import sys
     if hasattr(sys, 'getandroidapilevel') or os.environ.get('KIVY_BUILD') == 'android':
-        from kivy.core.text import LabelBase
-        LabelBase.register(name='ChineseFont', fn_regular='')
+        try:
+            from kivy.core.text import LabelBase
+            LabelBase.register(name='ChineseFont', fn_regular='/system/fonts/DroidSansFallback.ttf')
+        except:
+            pass
         return
 
     for font in ['C:/Windows/Fonts/msyh.ttc', 'C:/Windows/Fonts/simhei.ttf', 'C:/Windows/Fonts/simsun.ttc']:
@@ -426,7 +429,6 @@ class BackgroundWidget(FloatLayout):
         if bg_path:
             self.bg_image.source = bg_path
             self.bg_image.opacity = theme['bg_opacity']
-            self.bg_image.reload()
         else:
             self.bg_image.source = ''
             self._draw_gradient()
