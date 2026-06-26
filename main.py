@@ -63,17 +63,18 @@ import time
 
 def setup_fonts():
     """设置中文字体"""
-    # Android系统自带中文字体，直接用默认字体
     import sys
-    if hasattr(sys, 'getandroidapilevel') or os.environ.get('KIVY_BUILD') == 'android':
-        return  # Android默认字体已支持中文
+    is_android = hasattr(sys, 'getandroidapilevel') or os.environ.get('KIVY_BUILD') == 'android'
 
-    # 桌面环境使用Windows字体
+    # 尝试的字体路径
     font_paths = [
         'C:/Windows/Fonts/msyh.ttc',
         'C:/Windows/Fonts/simhei.ttf',
         'C:/Windows/Fonts/simsun.ttc',
+        '/system/fonts/DroidSansFallback.ttf',
+        '/system/fonts/NotoSansCJK-Regular.ttc',
     ]
+
     for font in font_paths:
         if os.path.exists(font):
             try:
@@ -81,7 +82,9 @@ def setup_fonts():
                 LabelBase.register(name='ChineseFont', fn_regular=font)
                 return
             except:
-                pass
+                continue
+
+    # 全失败了也不影响，Kivy会自动回退默认字体
 class ThemeManager:
     """主题管理器"""
     _instance = None
@@ -295,8 +298,7 @@ class EasterEggManager:
 class ThemeLabel(Label):
     def __init__(self, text_type='primary', **kwargs):
         super().__init__(**kwargs)
-        if not IS_ANDROID:
-            self.font_name = 'ChineseFont'
+        self.font_name = 'ChineseFont'
         self.text_type = text_type
         self.theme_manager = ThemeManager()
 
@@ -325,8 +327,7 @@ class ThemeLabel(Label):
 class ThemeButton(Button):
     def __init__(self, button_type='primary', **kwargs):
         super().__init__(**kwargs)
-        if not IS_ANDROID:
-            self.font_name = 'ChineseFont'
+        self.font_name = 'ChineseFont'
         self.button_type = button_type
 
         self.background_normal = ''
@@ -381,8 +382,7 @@ class ThemeButton(Button):
 class ThemeTextInput(TextInput):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        if not IS_ANDROID:
-            self.font_name = 'ChineseFont'
+        self.font_name = 'ChineseFont'
         self.background_normal = ''
         self.background_active = ''
         self.halign = 'center'
@@ -788,7 +788,6 @@ class RandomNumberTab(FloatLayout):
 
         popup = Popup(
             title='历史记录',
-            title_font='ChineseFont',
             content=content,
             size_hint=(0.9, 0.8),
             background=''
@@ -848,7 +847,6 @@ class TextRandomTab(FloatLayout):
             size_hint=(1, None),
             height=dp(200),
             multiline=True,
-            
             background_color=(1, 1, 0.98, 0.96),
             foreground_color=(0.25, 0.2, 0.1, 1),
             hint_text_color=(0.5, 0.45, 0.35, 0.9),
@@ -967,7 +965,6 @@ class ListRandomTab(FloatLayout):
             size_hint=(1, None),
             height=dp(180),
             multiline=True,
-            
             background_color=(1, 1, 0.98, 0.96),
             foreground_color=(0.25, 0.2, 0.1, 1),
             hint_text_color=(0.5, 0.45, 0.35, 0.9),
