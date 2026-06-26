@@ -1160,8 +1160,7 @@ class RandomToolApp(App):
         panel = TabbedPanel(
             do_default_tab=False,
             tab_pos='top_mid',
-            tab_width=Window.width / 4 if IS_ANDROID else 90,
-            tab_height=dp(48),
+            tab_height=60,
             background_color=theme['colors']['tab_bg']
         )
 
@@ -1176,7 +1175,10 @@ class RandomToolApp(App):
         for tab_text, tab_content in tabs:
             tab = TabbedPanelItem(text=tab_text)
             tab.font_name = 'ChineseFont'
-            tab.font_size = 12
+            tab.font_size = 16
+            tab.size_hint_x = 0.25
+            tab.size_hint_y = None
+            tab.height = 60
             tab.color = theme['colors']['tab_text']
             tab.background_color = theme['colors']['tab_bg']
             tab.add_widget(tab_content)
