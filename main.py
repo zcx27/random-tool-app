@@ -441,9 +441,22 @@ class BackgroundWidget(FloatLayout):
         theme = self.theme_manager.get_current_theme()
         bg_path = theme['bg_image']
 
-        if bg_path and os.path.exists(bg_path):
-            self.bg_image.source = bg_path
-            self.bg_image.opacity = theme['bg_opacity']
+        if bg_path:
+            # 适配 Android：尝试多个路径
+            paths_to_try = [
+                bg_path,
+                os.path.join(os.getcwd(), bg_path),
+            ]
+            loaded = False
+            for p in paths_to_try:
+                if os.path.exists(p):
+                    self.bg_image.source = p
+                    self.bg_image.opacity = theme['bg_opacity']
+                    loaded = True
+                    break
+            if not loaded:
+                self.bg_image.source = bg_path
+                self.bg_image.opacity = theme['bg_opacity']
         else:
             self.bg_image.source = ''
             self._draw_gradient()
@@ -1175,25 +1188,25 @@ class RandomToolApp(App):
         panel = TabbedPanel(
             do_default_tab=False,
             tab_pos='top_mid',
-            tab_height=88,
+            tab_height=100,
             background_color=theme['colors']['tab_bg']
         )
 
-        # 创建标签页（带 emoji 图标）
+        # 创建标签页
         tabs = [
-            ('🎲 随机数', RandomNumberTab()),
-            ('✨ 选择器', TextRandomTab()),
-            ('🔀 列表', ListRandomTab()),
-            ('⚙️ 关于', SettingsTab())
+            ('  随机数  ', RandomNumberTab()),
+            ('  选择器  ', TextRandomTab()),
+            ('  列表  ', ListRandomTab()),
+            ('  关于  ', SettingsTab())
         ]
 
         for tab_text, tab_content in tabs:
             tab = TabbedPanelItem(text=tab_text)
             tab.font_name = 'ChineseFont'
-            tab.font_size = 22
+            tab.font_size = 26
             tab.size_hint_x = 0.25
             tab.size_hint_y = None
-            tab.height = 88
+            tab.height = 100
             tab.color = theme['colors']['tab_text']
             tab.background_color = theme['colors']['tab_bg']
             tab.add_widget(tab_content)
