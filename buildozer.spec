@@ -32,5 +32,5 @@ android.accept_sdk_license = True
 # 构建目录
 log_level = 2
 
-# 离线模式
-p4a.offline = True
+# 在线模式（GitHub Actions 需要联网下载 p4a）
+# p4a.offline = True
