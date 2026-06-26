@@ -482,7 +482,9 @@ class BackgroundWidget(FloatLayout):
     def _update_size(self, *args):
         self.bg_image.size = self.size
         self.bg_image.pos = self.pos
-        self._draw_gradient()
+        # 只有没有背景图时才画渐变
+        if not self.bg_image.source or not os.path.exists(self.bg_image.source):
+            self._draw_gradient()
 
 
 class ContentBoxLayout(BoxLayout):
