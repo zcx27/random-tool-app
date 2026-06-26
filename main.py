@@ -62,16 +62,9 @@ import time
 # ============================================
 
 def setup_fonts():
-    """设置中文字体"""
-    import sys
-    if hasattr(sys, 'getandroidapilevel') or os.environ.get('KIVY_BUILD') == 'android':
-        try:
-            from kivy.core.text import LabelBase
-            LabelBase.register(name='ChineseFont', fn_regular='/system/fonts/DroidSansFallback.ttf')
-        except:
-            pass
+    """设置中文字体（仅桌面端需要，Android自带中文字体）"""
+    if IS_ANDROID:
         return
-
     for font in ['C:/Windows/Fonts/msyh.ttc', 'C:/Windows/Fonts/simhei.ttf', 'C:/Windows/Fonts/simsun.ttc']:
         if os.path.exists(font):
             try:
@@ -293,7 +286,8 @@ class EasterEggManager:
 class ThemeLabel(Label):
     def __init__(self, text_type='primary', **kwargs):
         super().__init__(**kwargs)
-        self.font_name = 'ChineseFont'
+        if not IS_ANDROID:
+            self.font_name = 'ChineseFont'
         self.text_type = text_type
         self.theme_manager = ThemeManager()
 
@@ -322,14 +316,13 @@ class ThemeLabel(Label):
 class ThemeButton(Button):
     def __init__(self, button_type='primary', **kwargs):
         super().__init__(**kwargs)
-        self.font_name = 'ChineseFont'
+        if not IS_ANDROID:
+            self.font_name = 'ChineseFont'
         self.button_type = button_type
 
         self.background_normal = ''
         self.background_down = ''
         self.background_color = (1, 1, 1, 0)
-
-        # 移动端按钮更大，方便触摸
         self.size_hint = (None, None) if 'size_hint' not in kwargs else kwargs['size_hint']
         self.height = 50 if 'height' not in kwargs else kwargs['height']
 
@@ -377,7 +370,8 @@ class ThemeButton(Button):
 class ThemeTextInput(TextInput):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.font_name = 'ChineseFont'
+        if not IS_ANDROID:
+            self.font_name = 'ChineseFont'
         self.background_normal = ''
         self.background_active = ''
         self.halign = 'center'
@@ -1168,7 +1162,7 @@ class RandomToolApp(App):
         ]
 
         for tab_text, tab_content in tabs:
-            tab = TabbedPanelItem(text=tab_text, font_name='ChineseFont')
+            tab = TabbedPanelItem(text=tab_text, font_name='ChineseFont' if not IS_ANDROID else '')
             tab.font_size = 32
             tab.size_hint_x = 0.25
             tab.size_hint_y = None
