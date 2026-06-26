@@ -1168,7 +1168,7 @@ class RandomToolApp(App):
         ]
 
         for tab_text, tab_content in tabs:
-            tab = TabbedPanelItem(text=tab_text)
+            tab = TabbedPanelItem(text=tab_text, font_name='ChineseFont')
             tab.font_size = 32
             tab.size_hint_x = 0.25
             tab.size_hint_y = None
