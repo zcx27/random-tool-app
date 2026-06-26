@@ -64,18 +64,12 @@ import time
 def setup_fonts():
     """设置中文字体"""
     import sys
-    is_android = hasattr(sys, 'getandroidapilevel') or os.environ.get('KIVY_BUILD') == 'android'
+    if hasattr(sys, 'getandroidapilevel') or os.environ.get('KIVY_BUILD') == 'android':
+        from kivy.core.text import LabelBase
+        LabelBase.register(name='ChineseFont', fn_regular='')
+        return
 
-    # 尝试的字体路径
-    font_paths = [
-        'C:/Windows/Fonts/msyh.ttc',
-        'C:/Windows/Fonts/simhei.ttf',
-        'C:/Windows/Fonts/simsun.ttc',
-        '/system/fonts/DroidSansFallback.ttf',
-        '/system/fonts/NotoSansCJK-Regular.ttc',
-    ]
-
-    for font in font_paths:
+    for font in ['C:/Windows/Fonts/msyh.ttc', 'C:/Windows/Fonts/simhei.ttf', 'C:/Windows/Fonts/simsun.ttc']:
         if os.path.exists(font):
             try:
                 from kivy.core.text import LabelBase
@@ -83,8 +77,6 @@ def setup_fonts():
                 return
             except:
                 continue
-
-    # 全失败了也不影响，Kivy会自动回退默认字体
 class ThemeManager:
     """主题管理器"""
     _instance = None
@@ -432,21 +424,9 @@ class BackgroundWidget(FloatLayout):
         bg_path = theme['bg_image']
 
         if bg_path:
-            # 适配 Android：尝试多个路径
-            paths_to_try = [
-                bg_path,
-                os.path.join(os.getcwd(), bg_path),
-            ]
-            loaded = False
-            for p in paths_to_try:
-                if os.path.exists(p):
-                    self.bg_image.source = p
-                    self.bg_image.opacity = theme['bg_opacity']
-                    loaded = True
-                    break
-            if not loaded:
-                self.bg_image.source = bg_path
-                self.bg_image.opacity = theme['bg_opacity']
+            self.bg_image.source = bg_path
+            self.bg_image.opacity = theme['bg_opacity']
+            self.bg_image.reload()
         else:
             self.bg_image.source = ''
             self._draw_gradient()
@@ -472,9 +452,6 @@ class BackgroundWidget(FloatLayout):
     def _update_size(self, *args):
         self.bg_image.size = self.size
         self.bg_image.pos = self.pos
-        # 只有没有背景图时才画渐变
-        if not self.bg_image.source or not os.path.exists(self.bg_image.source):
-            self._draw_gradient()
 
 
 class ContentBoxLayout(BoxLayout):
